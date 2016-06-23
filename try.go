@@ -94,7 +94,8 @@ func LoadUserFromToken(myToken string) (*User, error) {
 	//	fmt.Println("TOKEN", token, err)
 	//	return nil, errors.New("Token Parsing Problem")
 	//}
-	if _,err := bucket.Get(token.Claims["user"].(string),&u); err != nil{
+         // updated token.Claims["user"]  to token.Claims.(jwt.MapClaims)["user"] as per Migration of jwt 2.0 - jwt3.0 
+	if _,err := bucket.Get(token.Claims.(jwt.MapClaims)["user"].(string),&u); err != nil{
 		return nil, errors.New("User Loading Error")
 	}
 	return &u, nil
@@ -109,7 +110,8 @@ func (u *User) Save() bool{
 
 func (u *UserIntermediary) CreateUser() bool{
 	token := jwt.New(jwt.SigningMethodHS256)
-	token.Claims["user"] = u.User
+	// updated token.Claims["user"]  to token.Claims.(jwt.MapClaims) ["user"] as per Migration of jwt 2.0 - jwt3.0 
+	token.Claims.(jwt.MapClaims)["user"] = u.User
 	if encryptedToken, err := token.SignedString([]byte(hashToken)); err != nil{
 		return false
 	} else {
